@@ -89,7 +89,7 @@ disp('Q: ');
 disp(q);
 
 
-num_iteraciones =n/2; 
+num_iteraciones = floor(n/2); 
 resultados_finales = [];
 
 if rem(n, 2) == 1  
@@ -148,13 +148,10 @@ for i = 1:num_iteraciones
         if rand() < 0.5
             resultados_finales(end,:) = [];
         else
-            penultimo = resultados_finales(end-1,:)=[]
+            resultados_finales(end-1,:) = [];
         end
     end
-
 end
 
 fprintf('Resultados finales:\n');
 disp(resultados_finales);
-
-

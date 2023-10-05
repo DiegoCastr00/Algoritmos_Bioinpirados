@@ -5,7 +5,7 @@ datos = [
     -3 3 1;
 ];
 
-n = 10;
+n = 5;
 
 poblacion_total = [];
 real_total = [];
@@ -89,7 +89,7 @@ disp('Q: ');
 disp(q);
 
 
-num_iteraciones =n/2; 
+num_iteraciones = floor(n/2); 
 resultados_finales = [];
 
 if rem(n, 2) == 1  
@@ -155,5 +155,7 @@ end
 
 fprintf('Resultados finales:\n');
 disp(resultados_finales);
+
+mitad1_padre1 = fila_padre1(1:floor(end/2));
 
 
