@@ -72,7 +72,7 @@ disp('Normalizado:');
 disp(normalizado)
 
 E = sum(normalizado);
-fprintf("E: %f",E)
+fprintf("E: %f\n",E)
 
 p = normalizado / E;
 disp('P:');
@@ -89,11 +89,14 @@ disp('Q: ');
 disp(q);
 
 
-num_iteraciones = n / 2; 
+num_iteraciones =n/2; 
 resultados_finales = [];
 
-for i = 1:num_iteraciones
+if rem(n, 2) == 1  
+    num_iteraciones = num_iteraciones + 1;
+end
 
+for i = 1:num_iteraciones
     indice_padre1 = 0;
     indice_padre2 = 0;
     while indice_padre1 == indice_padre2
@@ -141,6 +144,13 @@ for i = 1:num_iteraciones
     disp(mut2);
     
     resultados_finales = [resultados_finales; mut1; mut2];
+    while size(resultados_finales, 1) > size(poblacion_total, 1)
+        if rand() < 0.5
+            resultados_finales(end,:) = [];
+        else
+            resultados_finales(end-1,:) = [];
+        end
+    end
 end
 
 fprintf('Resultados finales:\n');
