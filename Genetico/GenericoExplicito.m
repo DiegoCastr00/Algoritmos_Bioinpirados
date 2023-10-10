@@ -1,11 +1,12 @@
 clc;
 clear; 
 datos = [
-    -3 3 1;
-    -3 3 1;
+    -3 3 3;
+    -3 3 3;
 ];
 
-n = 5;
+n = 7;
+iteraciones = 1000 ;
 
 poblacion_total = [];
 real_total = [];
@@ -57,7 +58,6 @@ disp(poblacion_total);
 disp('Todos los reales:');
 disp(real_total);
 
-iteraciones = 2;
 
 for a = 1:iteraciones
     x = real_total(:, 1);
