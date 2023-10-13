@@ -5,12 +5,13 @@ datos = [
     -3 3 3;
     -3 3 3;
 ];
-individuos = 7;
-iteraciones = 10 ;
+individuos = 50;
+iteraciones = 40;
 
 poblacion_total = [];
 real_total = [];
 real_mutado_con = [];
+fx_primera_generacion = [];
 for i = 1:size(datos, 1)
     fila = datos(i, :);
 
@@ -37,16 +38,16 @@ for i = 1:size(datos, 1)
     % fprintf('Nb: %d\n',Nb);
     % disp('Poblacion:');
     % disp(poblacion);
-    disp('Valores en reales:');
-    disp(real);
-    disp('--------------------------------------');
+    % disp('Valores en reales:');
+    % disp(real);
+    % disp('--------------------------------------');
     pause(0.5);
 end
-disp('Primera generacion:');
-disp(poblacion_total);
-disp('Real de la primera generacion');
-disp(real_total);
-
+% disp('Primera generacion:');
+% disp(poblacion_total);
+% disp('Real de la primera generacion');
+% disp(real_total);
+real_total_primera = real_total;
 
 for a = 1:iteraciones
     x = real_total(:, 1);
@@ -58,7 +59,13 @@ for a = 1:iteraciones
     
     %disp('F(x):');
     % disp(fx)
-    
+     if a == 1
+        x = real(:, 1);
+        y = real(:, 1);
+        fx_primera_generacion = 3 * (1 - x).^2 .* exp(-x.^2 - (y + 1).^2) + ...
+            10 * (x / 5 - x.^3 - y.^5) .* exp(-x.^2 - y.^2) - ...
+            1/3 * exp(-((x + 1).^2) - y.^2);
+    end
     normalizado = abs(fx/(min(fx)+1));
     % disp('Normalizado:');
     % disp(normalizado)
@@ -176,18 +183,36 @@ for a = 1:iteraciones
     % disp(real_resultados_finales_2);
     
     real_total =[real_resultados_finales_1,real_resultados_finales_2];
-    fprintf('Generacion %d\n', a);
-    fprintf('Real total:\n');
-    disp(real_total)
-    fprintf('-------------------------------------------\n');
+    % fprintf('Generacion %d\n', a);
+    % fprintf('Real total:\n');
+    % disp(real_total)
+    % fprintf('-------------------------------------------\n');
     real_mutado_con = [real_mutado_con,real_mutado];
 
 end
-disp('-------------------------------------------');
-fprintf('Ultima generacion\n');
-disp(resultados_finales);
-fprintf('real de la ultima generacion\n');
-disp(real_total);
+% disp('Fx de la primera generación:');
+% disp(fx_primera_generacion);
+% disp('-------------------------------------------');
+% fprintf('Ultima generacion\n');
+% disp(resultados_finales);
+% fprintf('real de la ultima generacion\n');
+% disp(real_total);
+% disp('F(x):');
+% disp(fx)
+
+fprintf('maximo de la primera generacion\n');
+disp(max(fx_primera_generacion))
+fprintf('X1 primera generaicon: \n');
+disp(max(real_total_primera(:,1)))
+fprintf('X2 primera generaicon: \n');
+disp(max(real_total_primera(:,2)))
+
+fprintf('maximo de la ultima generacion\n');
+disp(max(fx))
+fprintf('X1 ultima generaicon: \n');
+disp(max(real_total(:, 1)))
+fprintf('X2 ultima generaicon: \n');
+disp(max(real_total(:, 2)))
 
 function valoresReales = binarioAReal(matrizBinaria,individuos,li,ls)
     Nb = size(matrizBinaria, 2);
