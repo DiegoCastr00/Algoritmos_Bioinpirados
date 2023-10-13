@@ -6,7 +6,7 @@ datos = [
     -3 3 3;
 ];
 individuos = 50;
-iteraciones = 40;
+iteraciones = 25;
 
 poblacion_total = [];
 real_total = [];
@@ -21,8 +21,10 @@ for i = 1:size(datos, 1)
 
     Nb = ceil(log((ls - li) * 10^press) + 0.9);
 
-    poblacion = round(custom_random(Nb, individuos));
+%     poblacion = round(custom_random(Nb, individuos));
 
+    poblacion = round(rand(individuos, Nb));
+    
     real = binarioAReal(poblacion,individuos,li,ls);
     % disp(real);
 
@@ -41,7 +43,7 @@ for i = 1:size(datos, 1)
     % disp('Valores en reales:');
     % disp(real);
     % disp('--------------------------------------');
-    pause(0.5);
+%     pause(0.5);
 end
 % disp('Primera generacion:');
 % disp(poblacion_total);
@@ -65,11 +67,11 @@ for a = 1:iteraciones
         fx_primera_generacion = 3 * (1 - x).^2 .* exp(-x.^2 - (y + 1).^2) + ...
             10 * (x / 5 - x.^3 - y.^5) .* exp(-x.^2 - y.^2) - ...
             1/3 * exp(-((x + 1).^2) - y.^2);
-    end
+     end
+     
     normalizado = abs(fx/(min(fx)+1));
     % disp('Normalizado:');
     % disp(normalizado)
-    
     E = sum(normalizado);
     % fprintf("E: %f\n",E)
     
@@ -132,7 +134,7 @@ for a = 1:iteraciones
         mut1 = hijo1;
         mut2 = hijo2;
         for k = 1:length(hijo1)
-            if rand() < 0.5
+            if rand() < 0.3
                 mut1(k) = ~hijo1(k);
                 mut2(k) = ~hijo2(k);
             end
@@ -199,20 +201,24 @@ end
 % disp(real_total);
 % disp('F(x):');
 % disp(fx)
+costo = iteraciones * individuos
 
-fprintf('maximo de la primera generacion\n');
-disp(max(fx_primera_generacion))
-fprintf('X1 primera generaicon: \n');
-disp(max(real_total_primera(:,1)))
-fprintf('X2 primera generaicon: \n');
-disp(max(real_total_primera(:,2)))
+max_fx_primera_generacion = max(fx_primera_generacion);
+indice_maximo_fx_primera_generacion = find(fx_primera_generacion == max_fx_primera_generacion);
+x1_primera_generacion_fx = real_total_primera(indice_maximo_fx_primera_generacion, 1);
+x2_primera_generacion_fx = real_total_primera(indice_maximo_fx_primera_generacion, 2);
+fprintf('Maximo de la primera generación: %f\n', max_fx_primera_generacion);
+fprintf('X1 primera generación: %f\n', x1_primera_generacion_fx);
+fprintf('X2 primera generación: %f\n', x2_primera_generacion_fx);
 
-fprintf('maximo de la ultima generacion\n');
-disp(max(fx))
-fprintf('X1 ultima generaicon: \n');
-disp(max(real_total(:, 1)))
-fprintf('X2 ultima generaicon: \n');
-disp(max(real_total(:, 2)))
+max_fx_ultima_generacion = max(fx);
+indice_maximo_fx_ultima_generacion = find(fx == max_fx_ultima_generacion);
+x1_ultima_generacion_fx = real_total(indice_maximo_fx_ultima_generacion, 1);
+x2_ultima_generacion_fx = real_total(indice_maximo_fx_ultima_generacion, 2);
+fprintf('\n\nMáximo de la última generación: %f\n', max_fx_ultima_generacion);
+fprintf('X1 última generación: %f\n', x1_ultima_generacion_fx);
+fprintf('X2 última generación: %f\n', x2_ultima_generacion_fx);
+
 
 function valoresReales = binarioAReal(matrizBinaria,individuos,li,ls)
     Nb = size(matrizBinaria, 2);
