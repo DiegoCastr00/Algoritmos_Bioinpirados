@@ -5,7 +5,7 @@ datos = [
     -3 3 3;
     -3 3 3;
 ];
-individuos = 50;
+individuos = 30;
 iteraciones = 25;
 
 poblacion_total = [];
@@ -128,7 +128,7 @@ for a = 1:iteraciones
         mut1 = hijo1;
         mut2 = hijo2;
         for k = 1:length(hijo1)
-            if rand() < 0.3
+            if rand() < 0.1
                 mut1(k) = ~hijo1(k);
                 mut2(k) = ~hijo2(k);
             end
