@@ -6,7 +6,7 @@ datos = [
     -3 3 3;
 ];
 individuos = 9;
-iteraciones = 205;
+iteraciones = 10;
 
 cr = 0.1; %cruza 
 xf=0.3;
