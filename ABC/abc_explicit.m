@@ -2,14 +2,14 @@ clc;
 clear;
 
 corridas = 1;
-iteraciones = 1;
+iteraciones = 200;
 
 fuentes = 5;
 equis= [
      -5 5;
      -5 5;
 ];
-
+cero = 0.001;
 limiteMaximo = fuentes * size(equis, 1);
 resultados = [];
 
@@ -18,26 +18,13 @@ for c = 1:corridas
     posicion = generarFuentes(equis,fuentes);
     limite = zeros(size(posicion, 1), 1);
 
-    sigma = [-0.1, 0.2;
-         0.2, 0.5; 
-         0.7, -0.3;
-         -0.5, 0.7;
-         0.3, -0.1];
-
-    posicion = [ 0.5, 0.3;
-              -0.2, 0.1;
-              -0.4, -0.7;
-               0.2, 0.05;
-               0.1, 0.9];
-    fx_fuente = funcionObjetivo(posicion)
+    fx_fuente = funcionObjetivo(posicion);
     mayorePosi = [];
     mayoreFx = min(fx_fuente);
+
     for g = 1:iteraciones
-
-        %k = randi(fuentes, 1, fuentes)  %No unicas
+        k = randi(fuentes, 1, fuentes);  %No unicas
         %k = randperm(fuentes); %Unicos
-
-        k = [3;1;5;2;1];
         v = nuevaSolucion(posicion,k,sigma);
 
         fx_v = funcionObjetivo(v);
@@ -73,12 +60,8 @@ for c = 1:corridas
         newPosicionAux = newPosicion(:, 1:end-1);
         newPosicionAux = newPosicionAux(1:size(posicion, 1), :);
 
-        k = [3;4;2;1;5];
-        sigma= [0.2, -0.15;
-                0.23, -0.02;
-                0.16, 0.2;
-                -0.1, 0.3;
-                -0.3, 0.12;];
+        k = randi(fuentes, 1, fuentes);
+        sigma = generarSigma(equis, fuentes);
 
         kaux = k.';
         dif_poblacion = newPosicionAux - (posicion(kaux, :));
@@ -96,29 +79,29 @@ for c = 1:corridas
                 limite(indice_v,:) = limite(indice_v,:) + 1;
             end
         end
-        posicion
-        fx_fuente
-        limite = [1;11;0;14;1;]
+        posicion;
+        fx_fuente;
 
         for i = 1:size(posicion, 1)
             if limite(i) >= limiteMaximo
                 if fx_fuente(i) < mayoreFx
-                    mayorePosi = posicion(i,:)
-                    mayoreFx = fx_fuente(i,:)
+                    mayorePosi = posicion(i,:);
+                    mayoreFx = fx_fuente(i,:);
                     limite(i,:) = 0;
-                    posicion(i,:) = mayorePosi
-                    fx_fuente(i,:) = mayoreFx
+                    posicion(i,:) = mayorePosi;
+                    fx_fuente(i,:) = mayoreFx;
                 end
             end
         end
-        posicion
-        fx_fuente
-        
-        limite
-        mayorePosi
-        mayoreFx
     end
+
+    final= [posicion, fx_fuente];
 end
+final
+[mejor_resultado, mejor_corrida] = min(final(:, 3));
+[peor_resultado, peor_corrida] = max(final(:, 3));
+fila_mejor = final(mejor_corrida, :)
+fila_peor = final(peor_corrida, :)
 
 
 function posicion = generarFuentes(equis, fuentes)

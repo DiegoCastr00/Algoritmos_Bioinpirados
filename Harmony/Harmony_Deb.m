@@ -1,7 +1,7 @@
 clc;
 clear;
-% rng('shuffle')
-corridas = 30;
+rng('shuffle')
+corridas = 1;
 iteraciones = 100000;
 
 equis= [
@@ -10,13 +10,14 @@ equis= [
     -0.55 0.55;
     -0.55 0.55;
 ];
-armonias = 20;
+armonias = 50;
 
 raccept = 0.9;
-rPA = 0.4;
+rPA = 0.3;
 bW = 0.085;
 
-cero = 0.001;
+cero_gordo =0.00001;
+todos=[];
 resultados = [];
 for c = 1:corridas
     HM = [];
@@ -77,9 +78,19 @@ for c = 1:corridas
         [g1_hijo,g2_hijo] = desigualdad(HM_hijo);
         [h3_hijo, h4_hijo, h5_hijo] = igualdad(HM_hijo);
 
+        h3_padre(h3_padre < cero_gordo) = 0;
+        h4_padre(h4_padre < cero_gordo) = 0;
+        h5_padre(h5_padre < cero_gordo) = 0;
+
+
+        h3_hijo(h3_hijo < cero_gordo) = 0;
+        h4_hijo(h4_hijo < cero_gordo) = 0;
+        h5_hijo(h5_hijo < cero_gordo) = 0;
+
 %         hjo_violaciones = [g1_hijo,g2_hijo,h3_hijo, h4_hijo, h5_hijo];
 
         % Restricción 3
+
         SVR_padre = max(0,g1_padre) + max(0,g2_padre) + abs(h3_padre) + abs(h4_padre) + abs(h5_padre);
         SVR_hijo = max(0,g1_hijo) + max(0,g2_hijo) + abs(h3_hijo) + abs(h4_hijo) + abs(h5_hijo);
 
@@ -93,8 +104,8 @@ for c = 1:corridas
 
         % Reglas de DEB
         % factibilidad del padre
-        if g1_padre <= 0 && g2_padre <= 0 && h3_padre == cero && h4_padre == cero && h5_padre == cero
-            if g1_hijo <= 0 && g2_hijo <= 0 && h3_hijo == cero && h4_hijo == cero && h5_hijo == cero
+        if g1_padre <= 0 && g2_padre <= 0 && h3_padre == 0 && h4_padre == 0 && h5_padre == 0
+            if g1_hijo <= 0 && g2_hijo <= 0 && h3_hijo == 0 && h4_hijo == 0 && h5_hijo == 0
                 % factibilidad del hijo
                 % Regla 1: Entre dos soluciones factibles, se elige la de menor valor objetivo
                 if fx_hijo < Worst
@@ -105,7 +116,7 @@ for c = 1:corridas
 %                     fprintf("regla 1, padre fue menor fo\n");
                 end
 
-            elseif g1_hijo > 0 || g2_hijo > 0 || h3_hijo ~= cero || h4_hijo ~= cero || h5_hijo ~= cero
+            elseif g1_hijo > 0 || g2_hijo > 0 || h3_hijo ~= 0 || h4_hijo ~= 0 || h5_hijo ~= 0
                 % Hijo es infactible
                 % Regla 2: Entre una solución factible y otra infactible, se prefiere la factible
                 HM = HM;
@@ -124,7 +135,7 @@ for c = 1:corridas
                 end
             end
 
-        elseif g1_hijo <= 0 && g2_hijo <= 0 && h3_hijo == cero && h4_hijo == cero && h5_hijo == cero
+        elseif g1_hijo <= 0 && g2_hijo <= 0 && h3_hijo == 0 && h4_hijo == 0 && h5_hijo == 0
             % Padre es infactible, pero hijo es factible
             HM(WorstIndex, :) = HM_hijo;
             fx_padre(WorstIndex, :) = fx_hijo;
@@ -151,15 +162,22 @@ for c = 1:corridas
     [h3, h4, h5] = igualdad(HM);
 
 %     final_violaciones = [g1,g2,h3, h4, h5];
+    h3(h3 < cero_gordo) = 0;
+    h4(h4 < cero_gordo) = 0;
+    h5(h5 < cero_gordo) = 0;
 
     SVR_final = max(0,g1) + max(0,g2) + abs(h3) + abs(h4) + abs(h5);
+
     best = min(SVR_final);
     bestIndex = find(SVR_final == best, 1, 'first');
     resultados = [resultados;HM(bestIndex, :), fx_padre(bestIndex), best];
+    todos = [todos;HM, fx_padre,SVR_final]
+    disp(c);
 end
 
-disp("Resultado de 30 corridas: ")
+disp("Resultado de 30 corridas: "), 
 disp("      x1        x2        x3        x4        fx        SVR")
+resultados;
 resultados = sortrows(resultados, size(resultados, 2));
 disp(resultados)
 
@@ -174,8 +192,6 @@ corrida_promedio = mean(resultados(:, 5))
 [peor_resultado, peor_corrida] = max(resultados(:, 6));
 fila_mejor = resultados(mejor_corrida, :)
 fila_peor = resultados(peor_corrida, :)
-
-
 
 
 function fx = funcionObjetivo(HM)
