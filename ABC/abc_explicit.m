@@ -18,20 +18,22 @@ for c = 1:corridas
     posicion = generarFuentes(equis,fuentes);
     limite = zeros(size(posicion, 1), 1);
 
+    sigma = [-0.1, 0.2;
+         0.2, 0.5; 
+         0.7, -0.3;
+         -0.5, 0.7;
+         0.3, -0.1];
+
+    posicion = [ 0.5, 0.3;
+              -0.2, 0.1;
+              -0.4, -0.7;
+               0.2, 0.05;
+               0.1, 0.9];
+    fx_fuente = funcionObjetivo(posicion)
+    mayorePosi = [];
+    mayoreFx = min(fx_fuente);
     for g = 1:iteraciones
-        sigma = [-0.1, 0.2;
-                 0.2, 0.5; 
-                 0.7, -0.3;
-                 -0.5, 0.7;
-                 0.3, -0.1];
 
-        posicion = [ 0.5, 0.3;
-                  -0.2, 0.1;
-                  -0.4, -0.7;
-                   0.2, 0.05;
-                   0.1, 0.9];
-
-        fx_fuente = funcionObjetivo(posicion);
         %k = randi(fuentes, 1, fuentes)  %No unicas
         %k = randperm(fuentes); %Unicos
 
@@ -40,8 +42,6 @@ for c = 1:corridas
 
         fx_v = funcionObjetivo(v);
 
-
-        
         for i = 1:size(posicion, 1)
             if fx_v(i) < fx_fuente(i)
                 posicion(i, :) = v(i, :);
@@ -51,6 +51,7 @@ for c = 1:corridas
                 limite(i) = limite(i)+ 1;  
             end
         end
+
         limite;
         posicion;
         fx_fuente;
@@ -86,22 +87,36 @@ for c = 1:corridas
         fx_newV = funcionObjetivo(v);
 
         for i = 1:size(posicion, 1)
+            indice_v = newfx(i,2);
             if fx_newV(i) < newfx(i,1)
-                indice_v = newfx(i,2);
                 limite(indice_v,:) = 0;
                 posicion(indice_v,:) = v(i,:);
-                fx_fuente(indice_v,:) = fx_newV(i,:);
+                fx_fuente(indice_v,:) = fx_newV(i,:);               
             else
-                indice_v = newfx(i,2);
                 limite(indice_v,:) = limite(indice_v,:) + 1;
             end
         end
-
         posicion
         fx_fuente
-        limite
+        limite = [1;11;0;14;1;]
 
+        for i = 1:size(posicion, 1)
+            if limite(i) >= limiteMaximo
+                if fx_fuente(i) < mayoreFx
+                    mayorePosi = posicion(i,:)
+                    mayoreFx = fx_fuente(i,:)
+                    limite(i,:) = 0;
+                    posicion(i,:) = mayorePosi
+                    fx_fuente(i,:) = mayoreFx
+                end
+            end
+        end
+        posicion
+        fx_fuente
         
+        limite
+        mayorePosi
+        mayoreFx
     end
 end
 
