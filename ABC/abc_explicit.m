@@ -2,10 +2,12 @@ clc;
 clear;
 
 corridas = 1;
-iteraciones = 200;
+iteraciones = 100;
 
 fuentes = 5;
 equis= [
+     -5 5;
+     -5 5;
      -5 5;
      -5 5;
 ];
@@ -68,6 +70,7 @@ for c = 1:corridas
         v = newPosicionAux + sigma .* dif_poblacion;
 
         fx_newV = funcionObjetivo(v);
+        
 
         for i = 1:size(posicion, 1)
             indice_v = newfx(i,2);
@@ -79,24 +82,19 @@ for c = 1:corridas
                 limite(indice_v,:) = limite(indice_v,:) + 1;
             end
         end
-        posicion;
-        fx_fuente;
 
         for i = 1:size(posicion, 1)
             if limite(i) >= limiteMaximo
-                if fx_fuente(i) < mayoreFx
-                    mayorePosi = posicion(i,:);
-                    mayoreFx = fx_fuente(i,:);
-                    limite(i,:) = 0;
-                    posicion(i,:) = mayorePosi;
-                    fx_fuente(i,:) = mayoreFx;
-                end
+                resultados = [resultados; posicion(i,:), fx_fuente(i,:)];
+                limite(i,:) = 0;
+                posicion(i,:) =  generarFuentes(equis,1);
+                fx_fuente(i,:) = funcionObjetivo(posicion(i,:));
             end
         end
     end
-
     final= [posicion, fx_fuente];
 end
+
 final
 [mejor_resultado, mejor_corrida] = min(final(:, 3));
 [peor_resultado, peor_corrida] = max(final(:, 3));
