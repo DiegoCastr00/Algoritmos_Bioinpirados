@@ -1,8 +1,8 @@
 clc;
 clear;
 
-corridas = 1;
-iteraciones = 100000;
+corridas = 30;
+iteraciones = 10000;
 
 fuentes = 50;
 
@@ -13,11 +13,12 @@ equis= [
     -0.55 0.55;
 ];
 
-cero_gordo = 0.000001;
+cero_gordo = 0.00001;
 limiteMaximo = fuentes * size(equis, 1);
-resultados = [];
 
+coresultados = [];
 for c = 1:corridas
+    resultados = [];
     sigma = generarSigma(equis, fuentes);
     posicion = generarFuentes(equis,fuentes);
     limite = zeros(size(posicion, 1), 1);
@@ -174,41 +175,58 @@ for c = 1:corridas
                 fx_fuente(i,:) = funcionObjetivo(posicion(i,:));
             end
         end
-
-    end
     final= [posicion, fx_fuente];
+    
+    end
+    disp(c)
+    [g1,g2] = desigualdad(posicion);
+    [h3, h4, h5] = igualdad(posicion);
+    h3(h3 < cero_gordo) = 0;
+    h4(h4 < cero_gordo) = 0;
+    h5(h5 < cero_gordo) = 0;
+    SVR_final = max(0,g1) + max(0,g2) + abs(h3) + abs(h4) + abs(h5);
+    final = [final,SVR_final];
+    
+    
+    final_filtrado = final(final(:, 6) == 0, :);
+    [mejor_resultado, mejor_corrida] = min(final_filtrado(:, 5));
+    [peor_resultado, peor_corrida] = max(final_filtrado(:, 5));
+    fila_mejor = final_filtrado(mejor_corrida, :);
+    fila_peor = final_filtrado(peor_corrida, :);
+    
+    
+    [g1,g2] = desigualdad(resultados(:, 1:end-1));
+    [h3, h4, h5] = igualdad(resultados(:, 1:end-1));
+    h3(h3 < cero_gordo) = 0;
+    h4(h4 < cero_gordo) = 0;
+    h5(h5 < cero_gordo) = 0;
+    SVR_final = max(0,g1) + max(0,g2) + abs(h3) + abs(h4) + abs(h5);
+    
+    resultados = [resultados,SVR_final];
+
+    final_filtrado = resultados(resultados(:, 6) == 0, :);
+    [mejor_resultado, mejor_corrida] = min(final_filtrado(:, 5));
+    [peor_resultado, peor_corrida] = max(final_filtrado(:, 5));
+    fila_mejor = final_filtrado(mejor_corrida, :);
+    fila_peor = final_filtrado(peor_corrida, :);
+    coresultados = [coresultados; fila_mejor];
 end
 
-[g1,g2] = desigualdad(posicion);
-[h3, h4, h5] = igualdad(posicion);
-h3(h3 < cero_gordo) = 0;
-h4(h4 < cero_gordo) = 0;
-h5(h5 < cero_gordo) = 0;
-SVR_final = max(0,g1) + max(0,g2) + abs(h3) + abs(h4) + abs(h5);
-final = [final,SVR_final];
+coresultados;
 
+disp("Resultado de 30 corridas: "), 
+disp("      x1        x2        x3        x4        fx        SVR")
+resultado = sortrows(coresultados, 5);
+disp(resultado)
+mejor_resultado = resultado(1,:)
+peor_resultado = resultado(end,:)
 
-final_filtrado = final(final(:, 6) == 0, :);
-[mejor_resultado, mejor_corrida] = min(final_filtrado(:, 5));
-[peor_resultado, peor_corrida] = max(final_filtrado(:, 5));
-fila_mejor = final_filtrado(mejor_corrida, :);
-fila_peor = final_filtrado(peor_corrida, :);
+disp("Costo computacional: ")
+costo = fuentes * iteraciones;
+disp(costo)
 
-
-[g1,g2] = desigualdad(resultados(:, 1:end-1));
-[h3, h4, h5] = igualdad(resultados(:, 1:end-1));
-h3(h3 < cero_gordo) = 0;
-h4(h4 < cero_gordo) = 0;
-h5(h5 < cero_gordo) = 0;
-SVR_final = max(0,g1) + max(0,g2) + abs(h3) + abs(h4) + abs(h5);
-
-resultados = [resultados,SVR_final]
-final_filtrado = resultados(resultados(:, 6) == 0, :);
-[mejor_resultado, mejor_corrida] = min(final_filtrado(:, 5));
-[peor_resultado, peor_corrida] = max(final_filtrado(:, 5));
-fila_mejor = final_filtrado(mejor_corrida, :)
-fila_peor = final_filtrado(peor_corrida, :)
-
+desviacion_estandar = std(resultado(:, 5))
+corrida_promedio = mean(resultado(:, 5))
 
 function posicion = generarFuentes(equis, fuentes)
     posicion = [];
